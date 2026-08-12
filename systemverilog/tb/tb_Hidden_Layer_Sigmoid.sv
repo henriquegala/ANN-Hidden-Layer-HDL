@@ -1,0 +1,143 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 25.07.2026 10:40:29
+// Design Name: 
+// Module Name: tb_Hidden_Layer_Sigmoid
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+import NN_types::*;
+ 
+module tb_Hidden_Layer_Sigmoid;
+ 
+    logic clk;
+    logic reset;
+ 
+    logic [15:0] x0, x1, x2, x3;
+    array_10x16  w0_array, w1_array, w2_array, w3_array, b_array;
+    array_10x16  y_array;
+ 
+    Hidden_Layer dut (
+        .clk       (clk),
+        .reset     (reset),
+        .x0        (x0),
+        .x1        (x1),
+        .x2        (x2),
+        .x3        (x3),
+        .w0_array  (w0_array),
+        .w1_array  (w1_array),
+        .w2_array  (w2_array),
+        .w3_array  (w3_array),
+        .b_array   (b_array),
+        .y_array   (y_array)
+    );
+ 
+    initial clk = 0;
+    always #5 clk = ~clk;
+ 
+    task automatic run_vector(
+        input string       label,
+        input logic [15:0] tx0, tx1, tx2, tx3,
+        input logic [15:0] tw0, tw1, tw2, tw3,
+        input logic [15:0] tb,
+        input int           latency_cycles
+    );
+        int i;
+        begin
+            @(posedge clk);
+            #1;
+            x0 = tx0; x1 = tx1; x2 = tx2; x3 = tx3;
+            for (i = 0; i < 10; i++) begin
+                w0_array[i] = tw0;
+                w1_array[i] = tw1;
+                w2_array[i] = tw2;
+                w3_array[i] = tw3;
+                b_array[i]  = tb;
+            end
+ 
+            repeat (latency_cycles) @(posedge clk);
+            #1;
+ 
+            $display("---------------------------------------------------");
+            $display("Vetor: %s", label);
+            $display("  x0=%0d x1=%0d x2=%0d x3=%0d", $signed(tx0), $signed(tx1), $signed(tx2), $signed(tx3));
+            $display("  w0=%0d w1=%0d w2=%0d w3=%0d  b=%0d", $signed(tw0), $signed(tw1), $signed(tw2), $signed(tw3), $signed(tb));
+            $display("  y_array[0] = 0x%h (esperado entre 0x0000 e 0x0100)", y_array[0]);
+            $display("  y_array[9] = 0x%h (esperado entre 0x0000 e 0x0100)", y_array[9]);
+        end
+    endtask
+ 
+    initial begin
+        reset = 1;
+        x0 = 0; x1 = 0; x2 = 0; x3 = 0;
+        for (int i = 0; i < 10; i++) begin
+            w0_array[i] = 0; w1_array[i] = 0;
+            w2_array[i] = 0; w3_array[i] = 0;
+            b_array[i]  = 0;
+        end
+ 
+        repeat (3) @(posedge clk);
+        #1;
+        reset = 0;
+ 
+        // ---------------- Vetores "faceis" ----------------
+ 
+        // V1: tudo zero -> soma = 0 -> sigmoide(0) = 0.5 -> y ~ 0x0080
+        run_vector("V1 - tudo zero (espera y ~ 0x0080)", 16'sd0, 16'sd0, 16'sd0, 16'sd0,
+                                                           16'sd0, 16'sd0, 16'sd0, 16'sd0,
+                                                           16'sd0, 4);
+ 
+        // V2: soma fortemente negativa -> deve SATURAR em 0x0000
+        run_vector("V2 - saturacao negativa (espera y = 0x0000)", 16'sd256, 16'sd256, 16'sd256, 16'sd256,
+                                                                    -16'sd2000, -16'sd2000, -16'sd2000, -16'sd2000,
+                                                                    -16'sd2000, 4);
+ 
+        // V3: soma fortemente positiva -> deve SATURAR em 0x0100
+        run_vector("V3 - saturacao positiva (espera y = 0x0100)", 16'sd256, 16'sd256, 16'sd256, 16'sd256,
+                                                                    16'sd2000, 16'sd2000, 16'sd2000, 16'sd2000,
+                                                                    16'sd2000, 4);
+ 
+        // V4: soma dentro da regiao ativa (perto de zero, levemente positiva)
+        run_vector("V4 - regiao ativa positiva leve", 16'sd128, 16'sd64, 16'sd32, 16'sd16,
+                                                        16'sd256, 16'sd256, 16'sd256, 16'sd256,
+                                                        16'sd50, 4);
+ 
+        // ---------------- Vetores "aleatorios" ----------------
+ 
+        run_vector("V5 - aleatorio 1", 16'sd300, -16'sd150, 16'sd75, -16'sd40,
+                                        16'sd100, 16'sd200, -16'sd90, 16'sd60,
+                                        16'sd20, 4);
+ 
+        run_vector("V6 - aleatorio 2", -16'sd200, 16'sd400, -16'sd60, 16'sd10,
+                                        -16'sd80, 16'sd150, 16'sd70, -16'sd120,
+                                        -16'sd30, 4);
+ 
+        run_vector("V7 - aleatorio 3 (regiao ativa negativa)", 16'sd512, 16'sd512, -16'sd512, -16'sd512,
+                                                                 16'sd256, -16'sd256, 16'sd256, -16'sd256,
+                                                                 -16'sd200, 4);
+ 
+        run_vector("V8 - aleatorio 4", -16'sd100, -16'sd50, -16'sd25, -16'sd10,
+                                        16'sd300, 16'sd300, 16'sd300, 16'sd300,
+                                        16'sd5, 4);
+ 
+        $display("---------------------------------------------------");
+        $display("Simulacao concluida.");
+        $stop;
+    end
+ 
+endmodule
+ 

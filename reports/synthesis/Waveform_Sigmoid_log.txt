@@ -1,0 +1,49 @@
+---------------------------------------------------
+Vetor: V1 - tudo zero (espera y ~ 0x0080)
+  x0=0 x1=0 x2=0 x3=0
+  w0=0 w1=0 w2=0 w3=0  b=0
+  y_array[0] = 0x0081 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x0081 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V2 - saturacao negativa (espera y = 0x0000)
+  x0=256 x1=256 x2=256 x3=256
+  w0=-2000 w1=-2000 w2=-2000 w3=-2000  b=-2000
+  y_array[0] = 0x0000 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x0000 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V3 - saturacao positiva (espera y = 0x0100)
+  x0=256 x1=256 x2=256 x3=256
+  w0=2000 w1=2000 w2=2000 w3=2000  b=2000
+  y_array[0] = 0x0100 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x0100 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V4 - regiao ativa positiva leve
+  x0=128 x1=64 x2=32 x3=16
+  w0=256 w1=256 w2=256 w3=256  b=50
+  y_array[0] = 0x00c2 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x00c2 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V5 - aleatorio 1
+  x0=300 x1=-150 x2=75 x3=-40
+  w0=100 w1=200 w2=-90 w3=60  b=20
+  y_array[0] = 0x007b (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x007b (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V6 - aleatorio 2
+  x0=-200 x1=400 x2=-60 x3=10
+  w0=-80 w1=150 w2=70 w3=-120  b=-30
+  y_array[0] = 0x00b9 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x00b9 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V7 - aleatorio 3 (regiao ativa negativa)
+  x0=512 x1=512 x2=-512 x3=-512
+  w0=256 w1=-256 w2=256 w3=-256  b=-200
+  y_array[0] = 0x0051 (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x0051 (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
+Vetor: V8 - aleatorio 4
+  x0=-100 x1=-50 x2=-25 x3=-10
+  w0=300 w1=300 w2=300 w3=300  b=5
+  y_array[0] = 0x004e (esperado entre 0x0000 e 0x0100)
+  y_array[9] = 0x004e (esperado entre 0x0000 e 0x0100)
+---------------------------------------------------
