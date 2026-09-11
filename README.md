@@ -1,6 +1,6 @@
 # ANN Hidden Layer — SystemVerilog & VHDL Implementation
 
-> ⚠️ **Draft / Private repo.** Developed during a summer research internship at the Instituto de Telecomunicações (IT). Publication pending advisor confirmation — this README is a working draft, not yet public-ready.
+> Developed during a summer research internship at the Instituto de Telecomunicações (IT).
 
 ## Overview
 A synchronous hidden layer with **10 parallel neurons, 4 inputs each**, implemented in full parity in both **SystemVerilog and VHDL**, with two selectable activation functions:
